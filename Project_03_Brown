@@ -1,0 +1,334 @@
+# DSCI 303 – Project 03
+### Darnell Brown
+
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+
+## Part A: Stock Simulation Function
+
+
+
+def simulate_stock(start, rate, vol, days):
+    
+    daily_rate = rate / 252.0
+    daily_vol = vol / (252.0 ** 0.5)
+    
+    daily_yields = np.random.normal(loc=daily_rate, scale=daily_vol, size=days)
+    
+    cumulative_yields = np.cumsum(daily_yields)
+    
+    daily_multipliers = np.exp(cumulative_yields)
+    
+    daily_prices = np.round(start * daily_multipliers, 2)
+    
+    simulated_prices = np.concatenate(([start], daily_prices))
+    
+    return simulated_prices
+
+Test your function
+
+np.random.seed(1)
+
+start_price = 500.0
+annual_rate = 0.08 
+annual_volatility = 0.3  
+simulated_days = 60
+simulated_prices = simulate_stock(start_price, annual_rate, annual_volatility, simulated_days)
+
+plt.figure(figsize=(12, 6))
+plt.plot(simulated_prices, label="Simulated Stock Prices")
+plt.title("Simulated Daily Stock Prices")
+plt.xlabel("Days")
+plt.ylabel("Price")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+final_price = simulated_prices[-1]
+print("Final Price:", final_price)
+
+## Part B: Annual Yield Function
+
+import math
+
+def find_yield(run):
+    initial_price = run[0]
+    final_price = run[-1]
+    days_in_run = len(run) - 1 
+
+    annual_yield = math.log(final_price / initial_price) * (252 / days_in_run)
+
+    return round(annual_yield, 4)
+
+About to test your function by running it on the previously simulated run
+
+annual_yield = find_yield(simulated_prices)
+
+# Print the result
+print("Annual Yield:", annual_yield)
+
+The next cell will explore the potential variability in our simulated runs by creating and plotting 25 simulated runs.
+
+num_simulations = 25
+start_price = 100.0
+annual_rate = 0.06  
+annual_volatility = 0.4  
+simulated_days = 200
+
+annual_yields = []
+
+plt.figure(figsize=(12, 6))
+for _ in range(num_simulations):
+    simulated_prices = simulate_stock(start_price, annual_rate, annual_volatility, simulated_days)
+    annual_yield = find_yield(simulated_prices)
+    annual_yields.append(annual_yield)
+    plt.plot(simulated_prices)
+
+mean_yield = np.mean(annual_yields)
+std_yield = np.std(annual_yields)
+
+plt.title("25 Simulated Daily Stock Price Runs")
+plt.xlabel("Days")
+plt.ylabel("Price")
+plt.grid(True)
+plt.show()
+
+print("Mean Annual Yield:", mean_yield)
+print("Standard Deviation of Annual Yields:", std_yield)
+
+The next cell will display the yields for the 25 simulated runs.
+
+print("List of Annual Yields:")
+print(annual_yields)
+
+## Part C: Finding Seeds that Generate Specific Outcomes
+
+In the cell below, Stock A has the highest simulated final price.
+
+np.random.seed(50)
+
+stock_parameters = [
+    {"name": "Stock A", "price": 78, "annual_return": 0.04, "volatility": 1.2},
+    {"name": "Stock B", "price": 75, "annual_return": 0.08, "volatility": 0.8},
+    {"name": "Stock C", "price": 72, "annual_return": 0.16, "volatility": 0.6}
+]
+
+simulated_days = 100
+
+plt.figure(figsize=(12, 6))
+
+for stock_params in stock_parameters:
+    stock_name = stock_params["name"]
+    start_price = stock_params["price"]
+    annual_rate = stock_params["annual_return"]
+    annual_volatility = stock_params["volatility"]
+    
+    simulated_prices = simulate_stock(start_price, annual_rate, annual_volatility, simulated_days)
+    plt.plot(simulated_prices, label=stock_name)
+
+plt.title("Simulated Daily Stock Price Runs")
+plt.xlabel("Days")
+plt.ylabel("Price")
+plt.grid(True)
+plt.legend()
+
+plt.show()
+
+"In the cell below, Stock B has the highest simulated final price.
+
+np.random.seed(32)
+
+stock_parameters = [
+    {"name": "Stock A", "price": 78, "annual_return": 0.04, "volatility": 1.2},
+    {"name": "Stock B", "price": 75, "annual_return": 0.08, "volatility": 0.8},
+    {"name": "Stock C", "price": 72, "annual_return": 0.16, "volatility": 0.6}
+]
+
+simulated_days = 100
+
+plt.figure(figsize=(12, 6))
+
+for stock_params in stock_parameters:
+    stock_name = stock_params["name"]
+    start_price = stock_params["price"]
+    annual_rate = stock_params["annual_return"]
+    annual_volatility = stock_params["volatility"]
+    
+    simulated_prices = simulate_stock(start_price, annual_rate, annual_volatility, simulated_days)
+    plt.plot(simulated_prices, label=stock_name)
+
+plt.title("Simulated Daily Stock Price Runs")
+plt.xlabel("Days")
+plt.ylabel("Price")
+plt.grid(True)
+plt.legend()
+
+plt.show()
+
+In the cell below, Stock C has the highest simulated final price.
+
+np.random.seed(25)
+
+stock_parameters = [
+    {"name": "Stock A", "price": 78, "annual_return": 0.04, "volatility": 1.2},
+    {"name": "Stock B", "price": 75, "annual_return": 0.08, "volatility": 0.8},
+    {"name": "Stock C", "price": 72, "annual_return": 0.16, "volatility": 0.6}
+]
+
+simulated_days = 100
+
+plt.figure(figsize=(12, 6))
+
+for stock_params in stock_parameters:
+    stock_name = stock_params["name"]
+    start_price = stock_params["price"]
+    annual_rate = stock_params["annual_return"]
+    annual_volatility = stock_params["volatility"]
+    
+    simulated_prices = simulate_stock(start_price, annual_rate, annual_volatility, simulated_days)
+    plt.plot(simulated_prices, label=stock_name)
+
+plt.title("Simulated Daily Stock Price Runs")
+plt.xlabel("Days")
+plt.ylabel("Price")
+plt.grid(True)
+plt.legend()
+
+plt.show()
+
+## Part D: Monte Carlo Simulation
+
+def monte_carlo(start, rate, vol, days, num_runs):
+    final_prices = []
+    annual_yields = []
+
+    for _ in range(num_runs):
+        simulated_prices = simulate_stock(start, rate, vol, days)
+        
+        final_price = simulated_prices[-1]
+        final_prices.append(final_price)
+        
+        annual_yield = find_yield(simulated_prices)
+        annual_yields.append(annual_yield)
+        
+    final_prices = np.array(final_prices)
+    annual_yields = np.array(annual_yields)
+
+    return final_prices, annual_yields
+
+Test the function by running a Monte Carlo simulation with a
+specific seed.
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(1)
+
+start_price = 200.0
+annual_rate = 0.10
+annual_volatility = 0.4 
+simulated_days = 500
+num_simulations = 10000
+
+final_prices, _ = monte_carlo(start_price, annual_rate, annual_volatility, simulated_days, num_simulations)
+
+plt.figure(figsize=[10, 5])
+plt.hist(final_prices, bins=np.arange(0, 1600, 50), edgecolor="black")
+plt.title("Monte Carlo Simulation of Final Stock Prices")
+plt.xlabel("Final Stock Price")
+plt.ylabel("Frequency")
+plt.grid(True)
+plt.show()
+
+About to display the 10th, 25th, 50th, 75th, and 90th percentiles of the simulated final prices.
+
+percentiles = [10, 25, 50, 75, 90]
+percentile_values = np.percentile(final_prices, percentiles)
+
+for i in range(len(percentiles)):
+    print(f"{percentiles[i]}th percentile: {percentile_values[i]:.2f}")
+
+## Part E: Effects of Volatility
+
+np.random.seed(1)
+
+start_price = 100.0
+annual_yield_A = 0.12  
+annual_yield_B = 0.12  
+volatility_A = 0.3
+volatility_B = 0.7
+simulated_days = 150
+num_simulations = 10000
+
+final_prices_A, annual_yields_A = monte_carlo(start_price, annual_yield_A, volatility_A, simulated_days, num_simulations)
+final_prices_B, annual_yields_B = monte_carlo(start_price, annual_yield_B, volatility_B, simulated_days, num_simulations)
+
+average_yield_A = np.mean(annual_yields_A)
+average_yield_B = np.mean(annual_yields_B)
+
+print(f"Average Annual Yield for A over {num_simulations} runs: {average_yield_A:.4f}")
+print(f"Average Annual Yield for B over {num_simulations} runs: {average_yield_B:.4f}")
+
+We will visually inspect the results of the two Monte Carlo simulations by plotting histograms of the final prices.
+
+plt.figure(figsize=[10, 5])
+
+plt.hist(final_prices_A, bins=np.arange(0, 600, 10), alpha=0.6, edgecolor="black", label="Stock A")
+plt.hist(final_prices_B, bins=np.arange(0, 600, 10), alpha=0.6, edgecolor="black", label="Stock B")
+
+plt.legend()
+plt.title("Histogram of Final Prices over 10,000 Runs")
+plt.xlabel("Final Stock Price")
+plt.ylabel("Frequency")
+plt.show()
+
+## Part F: Comparing Two Stocks
+
+np.random.seed(1)
+
+start_price = 120.0
+annual_yield_A = 0.08  
+annual_yield_B = 0.05  
+volatility_A = 0.2
+volatility_B = 0.5
+simulated_days = 252
+num_simulations = 10000
+
+final_prices_A, _ = monte_carlo(start_price, annual_yield_A, volatility_A, simulated_days, num_simulations)
+final_prices_B, _ = monte_carlo(start_price, annual_yield_B, volatility_B, simulated_days, num_simulations)
+
+proportion_A_above_B = np.mean(final_prices_A > final_prices_B)
+proportion_A_above_150 = np.mean(final_prices_A > 150)
+proportion_B_above_150 = np.mean(final_prices_B > 150)
+proportion_A_below_100 = np.mean(final_prices_A < 100)
+proportion_B_below_100 = np.mean(final_prices_B < 100)
+
+print("Proportions of runs in which...")
+print("-------------------------------")
+print(f"A ends above B: {proportion_A_above_B:.4f}")
+print(f"A ends above 150: {proportion_A_above_150:.4f}")
+print(f"B ends above 150: {proportion_B_above_150:.4f}")
+print(f"A ends below 100: {proportion_A_below_100:.4f}")
+print(f"B ends below 100: {proportion_B_below_100:.4f}")
+
+## Part G: Expected Call Payoff
+
+np.random.seed(1)
+
+start_price = 120.0
+annual_yield_A = 0.08  
+annual_yield_B = 0.05  
+volatility_A = 0.2
+volatility_B = 0.5
+simulated_days = 252
+num_simulations = 10000
+
+final_prices_A, _ = monte_carlo(start_price, annual_yield_A, volatility_A, simulated_days, num_simulations)
+
+strike_price = 225
+call_payoff = np.maximum(final_prices_A - strike_price, 0)
+
+average_call_payoff = np.mean(call_payoff)
+
+print("Average Call Payoff over 10,000 runs:", average_call_payoff)

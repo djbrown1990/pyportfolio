@@ -1,0 +1,297 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+## Part 1: Loading the Dataset; Preliminary Analysis
+
+import pandas as pd
+
+diamonds = pd.read_csv("diamonds.txt", sep='\t')
+
+print(diamonds.head(10))
+
+will determine the size of the dataset.
+
+diamonds.shape
+
+We will now inspect the distribution of the columns in diamonds
+
+diamonds_description = diamonds.describe()
+diamonds_description
+
+## Part 2: Filtering and Sorting
+
+we will start by viewing information about the 5 most expensive diamonds in the dataset
+
+diamonds[['price', 'carat', 'cut', 'color', 'clarity']].sort_values(by='price', ascending=False).head(5)
+
+we will now view information about the 5 least expensive diamonds in the dataset
+
+diamonds[['price', 'carat', 'cut', 'color', 'clarity']].sort_values(by='price', ascending=True).head(5)
+
+we will now view information about the 5 largest diamonds in the dataset with an ideal cut.
+
+diamonds[['price', 'carat', 'cut', 'color', 'clarity']][diamonds['cut'] == 'Ideal'].sort_values(by='carat', ascending=False).head(5)
+
+we will now view information about the 5 largest diamonds in the dataset with an fair cut.
+
+diamonds[['price', 'carat', 'cut', 'color', 'clarity']][diamonds['cut'] == 'Fair'].sort_values(by='carat', ascending=False).head(5)
+
+## Part 3: Working with Categorical Variables
+we will be creating lists to specify the order for each of the three categorical variables
+
+import pandas as pd
+
+df = pd.DataFrame({
+    'clarity': ['I1', 'SI2', 'VS1', 'VVS2', 'VS1', 'IF', 'SI1', 'VVS1'],
+    'cut': ['Good', 'Fair', 'Ideal', 'Premium', 'Very Good', 'Fair', 'Good', 'Ideal'],
+    'color': ['G', 'H', 'E', 'F', 'D', 'H', 'I', 'D']
+})
+
+clarity_levels = ['I1', 'SI2', 'SI1', 'VS2', 'VS1', 'VVS2', 'VVS1', 'IF']
+cut_levels = ['Fair', 'Good', 'Very Good', 'Premium', 'Ideal']
+color_levels = ['J', 'I', 'H', 'G', 'F', 'E', 'D']
+
+df['clarity'] = pd.Categorical(df['clarity'], categories=clarity_levels,ordered=True)
+df['cut'] = pd.Categorical(df['cut'], categories=cut_levels,ordered=True)
+df['color'] = pd.Categorical(df['color'], categories=color_levels,ordered=True)
+
+we will now use these lists to communicate to Pandas the correct order for the levels of the three categorical variables.
+
+from matplotlib import colors
+num_clarity_levels = len(clarity_levels)
+num_color_levels = len(color_levels)
+num_cut_levels = len(cut_levels)
+
+clarity_pal = list(colors.TABLEAU_COLORS)[:num_clarity_levels]
+color_pal = list(colors.TABLEAU_COLORS)[:num_color_levels]
+cut_pal = list(colors.TABLEAU_COLORS)[:num_cut_levels]
+
+print("clarity_pal:", clarity_pal)
+print("color_pal:", color_pal)
+print("cut_pal:", cut_pal)
+
+## Part 4: Displaying Counts for Categorical Variables
+will start by counting the number of diamonds for each level of cut.
+
+diamonds['cut'].value_counts().sort_index()
+
+you will now count the number of diamonds for each level of color.
+
+diamonds['color'].value_counts().sort_index()
+
+diamonds['clarity'].value_counts().sort_index()
+
+## Part 5: Scatterplots of Price Against Carat
+you will explore the relationship between the price and carat attributes by generating scatter plots.
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=[8, 6])
+
+plt.scatter(diamonds['carat'], diamonds['price'], s=20, alpha=0.4, color='blue', edgecolors='none')
+
+plt.xlabel("Carat Size")
+plt.ylabel("Price (in $)")
+plt.title("Relationship between Diamond Price and Carat Size")
+
+plt.show()
+
+we will reproduce the plot from above, but will now color the points according to their clarity.
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+plt.figure(figsize=[8, 6])
+
+for clarity, color in zip(clarity_levels, clarity_pal):
+    data = diamonds[diamonds['clarity'] == clarity]
+    plt.scatter(data['carat'], data['price'], s=20, alpha=0.4, color=color, label=clarity, edgecolors='none')
+
+plt.xlabel("Carat Size")
+plt.ylabel("Price (in $)")
+plt.title("Relationship between Diamond Price and Carat Size") 
+
+plt.legend(title="Clarity Levels")
+plt.show()    
+
+will now separate the points for each of the eight clarity levels into its own subplot.
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=[12, 6])
+
+for i, clarity in enumerate(clarity_levels):
+    plt.subplot(2, 4, i + 1)
+    
+    data = diamonds[diamonds['clarity'] == clarity]
+    
+    plt.scatter(data['carat'], data['price'], s=20, alpha=0.4, color=clarity_pal[i], edgecolors='none')
+    
+    plt.xlabel("Carat Size")
+    plt.ylabel("Price (in $)")
+    plt.title(clarity)
+    
+    plt.xlim(0, 4)
+    plt.ylim(0, 20000)
+    
+plt.tight_layout() 
+plt.show()
+
+## Part 6: Applying Logarithmic Transformations
+We will start by adding two new columns to the diamonds in order to store the transformed variables
+
+import numpy as np
+
+diamonds['ln_carat'] = np.log(diamonds['carat'])
+diamonds['ln_price'] = np.log(diamonds['price'])
+
+We will now use histograms to explore the distribution of the diamond prices, and the log of the diamond prices.
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=[12, 4])
+
+plt.subplot(1, 2, 1)
+plt.hist(diamonds['price'], bins=20, color='skyblue', edgecolor='black')
+plt.xlabel("Price")
+plt.ylabel("Count")
+plt.title("Histogram of Prices")
+
+plt.subplot(1, 2, 2)
+plt.hist(diamonds['ln_price'], bins=20, color='lightcoral', edgecolor='black')
+plt.xlabel("Natural Log of Price")
+plt.ylabel("Count")
+plt.title("Histogram of Log-Prices")
+
+plt.tight_layout()
+plt.show()
+
+We will now use histograms to explore the distribution of the carat sizes, and the log of the carat sizes.
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=[12, 4])
+
+plt.subplot(1, 2, 1)
+plt.hist(diamonds['carat'], bins=20, color='lightgreen', edgecolor='black')
+plt.xlabel("Carat Size")
+plt.ylabel("Count")
+plt.title("Histogram of Carat Sizes")
+
+plt.subplot(1, 2, 2)
+plt.hist(diamonds['ln_carat'], bins=20, color='lightcoral', edgecolor='black')
+plt.xlabel("Natural Log of Carat Size")
+plt.ylabel("Count")
+plt.title("Histogram of Log-Carat Sizes")
+
+plt.tight_layout()
+
+plt.show()
+
+## Part 7: Scatterplot of Transformed Variables
+
+We will create a scatterplot of ln_price against ln_carat, with points colored according to their clarity.
+
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=[8, 6])
+
+for clarity, color in zip(clarity_levels, clarity_pal):
+    data = diamonds[diamonds['clarity'] == clarity]
+    plt.scatter(data['ln_carat'], data['ln_price'], s=20, alpha=0.4, color=color, label=clarity, edgecolors='none')
+
+plt.xlabel("Natural Log of Carat Size")
+plt.ylabel("Natural Log of Price")
+plt.title("Relationship between Log-Price and Log-Carat Size")
+
+plt.show()
+
+## Part 8: Grouping by Cut
+We will create a grouped DataFrame displaying the mean price and carat size for each cut level.
+
+import pandas as pd
+
+gb_cut = diamonds[['cut', 'price', 'carat']].groupby('cut').mean()
+
+gb_cut
+
+We will now use bar charts to graphically display the information from the DataFrame above.
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=[12, 4])
+
+plt.subplot(1, 2, 1)
+plt.bar(gb_cut.index, gb_cut['price'], color=cut_pal, edgecolor='black')
+plt.xlabel("Cut")
+plt.ylabel("Mean Price")
+plt.title("Mean Price by Cut")
+
+plt.subplot(1, 2, 2)
+plt.bar(gb_cut.index, gb_cut['carat'], color=cut_pal, edgecolor='black')
+plt.xlabel("Cut")
+plt.ylabel("Mean Carat Size")
+plt.title("Mean Carat Size by Cut")
+
+plt.tight_layout()
+plt.show()
+
+## Part 9: Grouping by Color
+We will create a grouped DataFrame displaying the mean price and carat size for each color level.
+
+import pandas as pd
+
+gb_color = diamonds[['color', 'price', 'carat']].groupby('color').mean()
+
+gb_color
+
+We will now use bar charts to graphically display the information from the DataFrame above.
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=[12, 4])
+
+plt.subplot(1, 2, 1)
+plt.bar(gb_color.index, gb_color['price'], color=color_pal, edgecolor='black')
+plt.xlabel("Color")
+plt.ylabel("Mean Price")
+plt.title("Mean Price by Color")
+
+plt.subplot(1, 2, 2)
+plt.bar(gb_color.index, gb_color['carat'], color=color_pal, edgecolor='black')
+plt.xlabel("Color")
+plt.ylabel("Mean Carat Size")
+plt.title("Mean Carat Size by Color")
+
+plt.tight_layout()
+
+plt.show()
+
+## Part 10: Grouping by Clarity
+
+import pandas as pd
+
+gb_clarity = diamonds[['clarity', 'price', 'carat']].groupby('clarity').mean()
+
+gb_clarity
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=[12, 4])
+
+plt.subplot(1, 2, 1)
+plt.bar(gb_clarity.index, gb_clarity['price'], color=clarity_pal, edgecolor='black')
+plt.xlabel("Clarity")
+plt.ylabel("Mean Price")
+plt.title("Mean Price by Clarity")
+
+plt.subplot(1, 2, 2)
+plt.bar(gb_clarity.index, gb_clarity['carat'], color=clarity_pal, edgecolor='black')
+plt.xlabel("Clarity")
+plt.ylabel("Mean Carat Size")
+plt.title("Mean Carat Size by Clarity")
+
+plt.tight_layout()
+plt.show()

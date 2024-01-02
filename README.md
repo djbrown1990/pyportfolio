@@ -1,1 +1,2 @@
 # pyportfolio
+# Project_01 objective is to develop a model that can accurately forecast the average MPG of a car, using its weight as the basis. However, we will be utilizing the natural logarithm of MPG instead of the conventional MPG value. We assure you that this approach will become clearer in due course. Our goal will be to create a linear model that can be used to estimate the natural logarithm of average MPG for a vehicle based on the vehicle's weight. In other words, log-MPG will be used as the response variable in our model, and weight will be the predictor.

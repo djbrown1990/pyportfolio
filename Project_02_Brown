@@ -1,0 +1,159 @@
+### DSCI 303 – Project 02
+
+### Darnell Brown
+
+# Introduction
+
+In this project, you will be working with the gapminder dataset. This dataset contains socioeconomic data for 184 countries recorded over a period of 219 years, from 1800 to 2018.
+
+import pandas as pd
+df = pd.read_csv('gapminder_data.txt', sep='\t')
+df.head(10)
+
+country = df.country.to_list()
+continent = df.continent.to_list()
+year = df.year.to_list()
+population = df.population.to_list()
+life_exp = df.life_exp.to_list()
+pcgdp = df.gdp_per_cap.to_list()
+gini = df.gini.to_list()
+
+N = 0
+print('Country: ', country[N])
+print('Continent: ', continent[N])
+print('Year: ', year[N])
+print('Population: ', population[N])
+print('Life Expectancy: ', life_exp[N])
+print('Per Capita GDP: ', pcgdp[N])
+print('Gini Index: ', gini[N])
+
+# Part 1: Displaying Past 20 Years of US Data
+
+filtered_df = df[(df['year'] >= 1999) & (df['country'] == 'United States')]
+
+print("Year   Country   Population   LExp   pcGDP   Gini")
+print("-" * 60)
+
+for index, row in filtered_df.iterrows():
+    year = row['year']
+    country = row['country']
+    population = row['population']
+    life_expectancy = row['life_exp']
+    per_capita_gdp = row['gdp_per_cap']
+    gini_index = row['gini']
+    
+    print(f"{year}    {country}    {population}    {life_expectancy}    {per_capita_gdp}    {gini_index}")
+
+# Part 2: Selecting the 2018 Data
+
+country_2018 = []
+population_2018 = []
+continent_2018 = []
+life_exp_2018 =[]
+pcgdp_2018 = []
+gini_2018 =[]
+
+filtered_df2 = df[(df['year'] == 2018)]
+
+for record_2018 in filtered_df2.iterrows():
+    country_2018.append(row['country'])
+    population_2018.append(row['population'])
+    continent_2018.append(row['continent'])
+    life_exp_2018.append(row['life_exp'])
+    pcgdp_2018.append(row['gdp_per_cap'])
+    gini_2018.append(row['gini'])
+
+filtered_df_2018 = df[df['year'] == 2018]
+
+global_population_2018 = filtered_df_2018['population'].sum()
+
+print(f"The global population in 2018 was {global_population_2018}.")
+
+# Part 3: Identifying Countries with Largest and Smallest Populations
+
+sorted_population_2018 = sorted(population_2018, reverse=True)
+
+tenth_largest_population = sorted_population_2018[9]
+
+print("Countries with Largest Populations in 2018")
+print("-" * 50)
+
+printed_lines = 0
+
+for i in range(len(country_2018)):
+    if population_2018[i] >= tenth_largest_population:
+        print(f"The population of {country_2018[i]} in 2018 was {population_2018[i]}.")
+        printed_lines += 1
+    if printed_lines == 2:
+            break
+
+
+tenth_smallest_population = sorted_population_2018[-10]
+
+print("Countries with Smallest Populations in 2018")
+print("-" * 50)
+
+printed_lines = 0
+j = 0 
+for j in range(len(country_2018)):
+    if population_2018[j] <= tenth_smallest_population:
+        print(f"The population of {country_2018[j]} in 2018 was {population_2018[j]}.")
+        printed_lines += 1
+    if printed_lines == 2:
+            break
+
+# Part 4: Identifying Countries with Highest and Lowest Life Expectancies
+
+sorted_life_expectancy = sorted(life_exp_2018, reverse=True)
+
+highest_life_expectancy = sorted_life_expectancy[9]
+
+print("Countries with Highest Life Expectancy in 2018")
+print("-" * 50)
+
+printed_lines = 0
+
+for h in range(len(country_2018)):
+    if life_exp_2018[h] >= highest_life_expectancy:
+        print(f"The life expectancy in 2018 for {country_2018[h]} was {life_exp_2018[h]}.")
+        printed_lines += 1
+        if printed_lines == 2:
+            break
+
+
+lowest_life_expectancy = sorted_life_expectancy[-10]
+
+print("Countries with Lowest Life Expectancy in 2018")
+print("-" * 50)
+
+printed_lines = 0
+
+for h in range(len(country_2018)):
+    if life_exp_2018[h] >= lowest_life_expectancy:
+        print(f"The life expectancy in 2018 for {country_2018[h]} was {life_exp_2018[h]}.")
+        printed_lines += 1
+        if printed_lines == 2:
+            break
+
+# Part 5: Calculating GDP by Country
+
+gdp_2018 = []
+
+for i in range(len(country_2018)):
+    gdp_value = pcgdp_2018[i]
+    gdp_2018.append(gdp_value)
+
+total_global_gdp_2018 = sum(pcgdp_2018)
+
+print(f"The total global GDP in 2018 was ${total_global_gdp_2018:,.2f}.")
+
+highest_gdp_country = country_2018[gdp_2018.index(max(pcgdp_2018))]
+highest_gdp_value = max(pcgdp_2018)
+
+lowest_gdp_country = country_2018[gdp_2018.index(min(pcgdp_2018))]
+lowest_gdp_value = min(pcgdp_2018)
+
+print(f"The country with the highest GDP in 2018 was {highest_gdp_country} with a GDP of ${highest_gdp_value:,.2f}.")
+print(f"The country with the lowest GDP in 2018 was {lowest_gdp_country} with a GDP of ${lowest_gdp_value:,.2f}.")
+
+# Part 6: Grouping by Continent

@@ -1,0 +1,291 @@
+# DSCI 303 – Project 01
+
+Our objective is to develop a model that can accurately forecast the average MPG of a car, using its weight as the basis. However, we will be utilizing the natural logarithm of MPG instead of the conventional MPG value. We assure you that this approach will become clearer in due course. Our goal will be to create a linear model that can be used to estimate the natural logarithm of average MPG for a vehicle based on the vehicle's weight. In other words, log-MPG will be used as the response variable in our model, and weight will be the predictor. 
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+## Part 1: Importing and Viewing the Data
+
+df = pd.read_table(filepath_or_buffer='auto_data.txt', sep='\t')
+weight = list(df.wt)
+mpg = list(df.mpg)
+ln_mpg = list(df.ln_mpg)
+
+I will now confirm each list contains 398 values
+
+print(len(weight))
+print(len(mpg))
+print(len(ln_mpg))
+
+In a new code cell, use a loop to print the first 10 values of each of the lists weight, mpg, and ln_mpg. Format the output as follows:
+• The list values should be arranged in columns, with each row of output corresponding to one vehicle model.
+• The output should include column headers and a dividing line, as shown below.
+• The number of characters reserved for each column, in order, should be 6, 8, and 10.
+• The columns should be right aligned.
+• Exactly 1 decimal digit should be displayed for each mpg value, and exactly 4 decimal digits should be displayed for each ln_mpg value.
+
+plt.figure(figsize=[12,4])
+plt.subplot(1,2,1)
+plt.scatter(weight, mpg, c='skyblue', edgecolor='k')
+plt.xlabel('Weight (in Pounds)')
+plt.ylabel('MPG')
+plt.title('Plot of MPG against Weight')
+plt.subplot(1,2,2)
+plt.scatter(weight, ln_mpg, c='skyblue', edgecolor='k')
+plt.xlabel('Weight (in Pounds)')
+plt.ylabel('Natural Logarithm of MPG')
+plt.title('Plot of Log-MPG against Weight')
+plt.show()
+
+n_values_to_display = 10
+print(f"{'Weight':>6}{'MPG':>8}{'LN_MPG':>10}")
+print("-" * 30)
+
+for i in range(n_values_to_display):
+    print(f"{weight[i]:>6.0f}{mpg[i]:>8.1f}{ln_mpg[i]:>10.4f}")
+
+
+plt.figure(figsize=[12,4])
+plt.subplot(1,2,1)
+plt.scatter(weight, mpg, c='skyblue', edgecolor='k')
+plt.xlabel('Weight (in Pounds)')
+plt.ylabel('MPG')
+plt.title('Plot of MPG against Weight')
+plt.subplot(1,2,2)
+plt.scatter(weight, ln_mpg, c='skyblue', edgecolor='k')
+plt.xlabel('Weight (in Pounds)')
+plt.ylabel('Natural Logarithm of MPG')
+plt.title('Plot of Log-MPG against Weight')
+plt.show()
+
+## Part 2: Splitting the Data
+
+When splitting data into training and test sets, it is important to either randomly select the rows of the data set that are to be used in each set, or to randomly shuffle the rows before splitting the data set. The reason for this is that data is sometimes recorded in a systematic way. For example, the observations might be sorted according to the values in one of the columns. If you don't randomly select rows and instead just take the first several rows for the training set and the last several rows for the test set, then your two sets might contain records of very different types, neither of which will be representative of the dataset as a whole.
+While this is an important consideration, and one we will discuss again later in the course, the records in our dataset have fortunately already been shuffled, so this will not be a concern for us in this project. We will simply use the first 300 records for our training set, and will use the last 98 records for the test set.
+Create six
+
+
+x_train = weight[:300]
+x_test = weight[-98:]
+
+
+y_train = ln_mpg[:300]
+y_test = ln_mpg[-98:]
+
+mpg_train = mpg[:300]
+mpg_test = mpg[-98:]
+
+
+n_train = len(x_train)
+n_test = len(x_test)
+
+print(f"Training Set Size: {n_train} \nTest Set Size:     {n_test}")
+
+
+
+
+plt.figure(figsize=[12,4])
+plt.subplot(1,2,1)
+plt.scatter(x_train, y_train, c='skyblue', edgecolor='k')
+plt.xlabel('Weight (in Pounds)')
+plt.ylabel('Natural Logarithm of MPG')
+plt.title('Training Set')
+plt.subplot(1,2,2)
+plt.scatter(x_test, y_test, c='skyblue', edgecolor='k')
+plt.xlabel('Weight (in Pounds)')
+plt.ylabel('Natural Logarithm of MPG')
+plt.title('Test Set')
+plt.show()
+
+## Part 3: Descriptive Statistics
+
+The mean or average of a collection of 𝑛 numbers is the sum of those numbers divided by 𝑛. Let 𝑥̅ denote the mean of the values 𝑥1,𝑥2,…,𝑥𝑛 stored in x_train, and let 𝑦̅ denote the mean of the values 𝑦1,𝑦2,…,𝑦𝑛 stored in y_train. Formulas for 𝑥̅ and 𝑦̅ are provided below.
+𝑥̅ = 1𝑛Σ𝑥𝑖𝑛𝑖 = 1 = 1𝑛(𝑥1+𝑥2+⋯+𝑥𝑛)
+𝑦̅ = 1𝑛Σ𝑦𝑖𝑛𝑖 = 1 = 1𝑛(𝑦1+𝑦2+⋯+𝑦𝑛)
+
+
+mean_x = sum(x_train) / n_train
+
+
+mean_y = sum(y_train) / n_train
+
+print(f"Mean of X: {mean_x:.2f}")
+print(f"Mean of Y: {mean_y:.4f}")
+
+
+We will now be calculating 𝑆𝑥𝑥 and 𝑆𝑦𝑦.
+
+Sxx = 0
+Syy = 0
+
+for i in range(n_train):
+    Sxx += (x_train[i] - mean_x) ** 2
+    Syy += (y_train[i] - mean_y) ** 2
+
+
+print(f"Sxx = {Sxx:.2f}")
+print(f"Syy = {Syy:.4f}")
+
+
+
+
+
+
+
+We will now be calculating the variance of the training values of 𝑋 and 𝑌.
+
+var_x = Sxx / (n_train - 1)
+var_y = Syy / (n_train - 1)
+
+print(f"Variance of X = {var_x:.2f}")
+print(f"Variance of Y = {var_y:.4f}")
+
+## Part 4: Linear Regression Model
+
+Sxy = 0
+
+for i in range(n_train):
+    Sxy += (x_train[i] - mean_x) * (y_train[i] - mean_y)
+
+Sxy /= (n_train - 1)
+
+print(f"Covariance between X and Y = {Sxy:.2f}")
+
+We will now be calculating the coefficients of our model.
+
+beta_1 = Sxy / Sxx
+
+beta_0 = mean_y - beta_1 * mean_x
+
+print(f"Estimated intercept (𝛽̂0): {beta_0:.4f}")
+print(f"Estimated slope (𝛽̂1): {beta_1:.8f}")
+
+We will now visualize the regression line by plotting it on top of the scatter plots for the training set as well as for the test set.
+
+y_vals = [beta_0 + beta_1 * 1500, beta_0 + beta_1 * 5500]
+plt.figure(figsize=[12,4])
+plt.subplot(1,2,1)
+plt.scatter(x_train, y_train, c='skyblue', edgecolor='k')
+plt.plot([1500,5500], y_vals, c='crimson', lw=3)
+plt.xlabel('Weight (in Pounds)')
+plt.ylabel('Natural Logarithm of MPG')
+plt.title('Training Set')
+plt.subplot(1,2,2)
+plt.scatter(x_test, y_test, c='skyblue', edgecolor='k')
+plt.plot([1500,5500], y_vals, c='crimson', lw=3)
+plt.xlabel('Weight (in Pounds)')
+plt.ylabel('Natural Logarithm of MPG')
+plt.title('Test Set')
+plt.show()
+
+## Part 5: Training Score
+
+We will be calculating the training r-squared score, and that we will start by calculating estimated response values for the training set.
+
+pred_y_train = [beta_0 + beta_1 * x for x in x_train]
+
+We will now calculate the residuals for the training set.
+
+error_y_train = [y_train[i] - pred_y_train[i] for i in range(len(y_train))]
+
+print(f"{'y_train':>6}{'pred_y_train':>10}{'error_y_train':>10}")
+print("-" * 30)
+
+for i in range(10):
+    y = round(y_train[i], 4)
+    pred_y = round(pred_y_train[i], 4)
+    error = round(error_y_train[i], 4)
+    print(f"{y:>6}{pred_y:>10}{error:>10}")
+
+sse_train = sum(error ** 2 for error in error_y_train)
+
+print(f"Training SSE = {sse_train:.4f}")
+
+We will now calculate the r-squared score for the training set.
+
+mean_y_train = sum(y_train) / len(y_train)
+
+
+tss = sum((y - mean_y_train) ** 2 for y in y_train)
+
+
+rss = sum(error ** 2 for error in error_y_train)
+
+
+r2_train = 1 - (rss / tss)
+
+print(f"Training r-Squared = {r2_train:.4f}")
+
+## Part 6: Test Score
+
+We will be calculating the test r-squared score, and that we will start by calculating estimated response values for the test set.
+
+pred_y_test = [beta_0 + beta_1 * x for x in x_test]
+
+We will now calculate the residuals for the test set.
+
+error_y_test = [y_test[i] - pred_y_test[i] for i in range(len(y_test))]
+
+Before continuing on with our calculation of the r-squared score, we will display the true 𝑌 values, the predicted 𝑌 values, and the residual for each of the first 10 observations in the test set.
+
+print(f"{'y_test':>6}{'pred_y_test':>10}{'error_y_test':>10}")
+print("-" * 30)
+
+for i in range(10):
+    y = round(y_test[i], 4)
+    pred_y = round(pred_y_test[i], 4)
+    error = round(error_y_test[i], 4)
+    print(f"{y:>6}{pred_y:>10}{error:>10}")
+
+We will now calculate the sum of squared errors score for the test set.
+
+sse_test = sum([(error ** 2) for error in error_y_test])
+
+print(f"Test SSE = {sse_test:.4f}")
+
+We will now calculate the value of 𝑆𝑌𝑌 on the test set, and will then use that and the test sum of squared errors to calculate the test r-squared score.
+
+mean_y_test = sum(y_test) / len(y_test)
+Syy_test = sum((y - mean_y_test) ** 2 for y in y_test)
+
+residuals_test = [y_test[i] - pred_y_test[i] for i in range(len(y_test))]
+
+
+ssr_test = sum(residual ** 2 for residual in residuals_test)
+r2_test = 1 - (ssr_test / Syy_test)
+
+
+print(f"Test r-Squared = {r2_test:.4f}")
+
+We will now create a plot to visualize the errors for the observations in the test set.
+
+plt.figure(figsize=[8,4])
+plt.scatter(x_test, y_test, c='skyblue', edgecolor='k')
+plt.plot([1500,5250], [beta_0 + beta_1 * 1500, beta_0 + beta_1 * 5250], 
+         c='crimson', lw=3)
+for i in range(n_test):
+    plt.plot([x_test[i], x_test[i]], [pred_y_test[i], y_test[i]],
+        c='coral', zorder=0) 
+plt.show()
+
+## Part 7: Transforming Test Predictions
+ 
+ we will be calculating estimates for the average MPG for observations in our test set.
+
+e = 2.718281828
+
+pred_mpg_test = [e ** pred_y for pred_y in pred_y_test]
+
+We will now calculate the error in each estimate for the average MPG
+
+error_mpg_test = [mpg_test[i] - pred_mpg_test[i] for i in range(len(mpg_test))]
+
+W will now display the true MPG, the estimated MPG, and the estimation error for each of the first 10 observations in the test set.
+
+print("{:>8} {:>12} {:>9}".format("True MPG", "Pred MPG", "Error"))
+
+print("-" * 30)
+
+for i in range(10):
+    print("{:>8.1f} {:>12.1f} {:>9.1f}".format(mpg_test[i], pred_mpg_test[i], error_mpg_test[i]))
